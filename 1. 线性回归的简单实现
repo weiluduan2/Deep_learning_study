@@ -1,0 +1,38 @@
+import numpy as np
+import torch
+from torch.utils import data
+from d2l import torch as d2l
+from torch import nn
+true_w=torch.Tensor([2,-3.4])
+true_b=4.2
+features,labels=d2l.synthetic_data(true_w,true_b,1000)
+
+#定义data_itr,传入的是打包好的数据的array，
+def data_itr(data_array,batch_size,is_train=True):
+    dataset=data.TensorDataset(*data_array)
+    dataset=data.DataLoader(dataset,batch_size,shuffle=is_train)
+    return dataset
+#
+​
+net=nn.Sequential(nn.Linear(2,1))
+net[0].weight.data.normal_()
+net[0].bias.data.fill_(0)
+loss=nn.MSELoss()
+trainer=torch.optim.SGD(net.parameters(),lr=0.03)
+​
+epcho_num=3
+print(net[0].weight.data)
+print(net[0].bias.data)
+​
+for epcho in range(epcho_num):
+    for X,y in data_itr((features,labels),10):
+        l=loss(net(X),y)
+        trainer.zero_grad()
+        l.backward()
+        trainer.step()
+        #print("epco ",epcho,"loss is",l)
+    l=loss(net(features),labels)
+    print("epco ",epcho,"loss is",l)
+    
+print(net[0].weight.data)
+print(net[0].bias.data)
