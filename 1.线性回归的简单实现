@@ -8,22 +8,38 @@ true_b=4.2
 features,labels=d2l.synthetic_data(true_w,true_b,1000)
 
 #定义data_itr,传入的是打包好的数据的array，
+#切记设置batch size，以及is train
 def data_itr(data_array,batch_size,is_train=True):
     dataset=data.TensorDataset(*data_array)
     dataset=data.DataLoader(dataset,batch_size,shuffle=is_train)
     return dataset
-#
-​
+
+​#实例化net，并且初始化参数，
+#实例化loss函数
+#实例化训练器
 net=nn.Sequential(nn.Linear(2,1))
 net[0].weight.data.normal_()
 net[0].bias.data.fill_(0)
 loss=nn.MSELoss()
 trainer=torch.optim.SGD(net.parameters(),lr=0.03)
 ​
+
+#设置好迭代周期，迭代周期等于 数据总量/batch——size
 epcho_num=3
 print(net[0].weight.data)
 print(net[0].bias.data)
 ​
+#开始建立三个实例化了的函数，以及参数，数据的连接
+#首先，参数被保存在net里，无需设置只需初始化
+#其次，原始数据通过直接输入给net，从而交由net处理，且会return一个输出，即为y——hat
+#3.将net（）的输出，输入给loss，同时还有真实值y，loss会自动计算损失
+#.清空trainer的grad-------------------------目前还不能很准确的知道为啥！！！！！！！！！！！，笨呐！！！！！！！！！！！！！！！！！！！
+#4..目前已经完成了，参数，数据，损失函数，网络的连接，还有trainer没建立连接
+#   其实并不是，trainer已经在实例化时候将参数传进去，已经建立起连接了
+#    
+#    接下来需要更新梯度，只需要调用step函数就能直接读取loss对x的梯度来更新参数，用于下一次迭代
+#    但是loss对x的梯度还没计算呢，所以需要一步l.backward计算一下梯度
+
 for epcho in range(epcho_num):
     for X,y in data_itr((features,labels),10):
         l=loss(net(X),y)
@@ -36,3 +52,4 @@ for epcho in range(epcho_num):
     
 print(net[0].weight.data)
 print(net[0].bias.data)
+## 完成！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
